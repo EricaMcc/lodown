@@ -30,9 +30,10 @@ identity: Returns any input value
 */
 
 
-_.identity = function(value) {
+function identity(value) {
     return value;
-};
+}
+module.exports.identity = identity;
 
 /*
 typeof: Returns the type of any value in the form of a string. Can be used
@@ -42,7 +43,7 @@ or objects.
 @param {any value} value: The value for which return the value type
 */
 
-_.typeOf = function(value) {
+function typeOf(value) {
     if (typeof value === 'string') {
         return 'string';
     } else if (typeof value === 'number') {
@@ -61,7 +62,8 @@ _.typeOf = function(value) {
     } else {
         return 'object';
     }
-};
+}
+module.exports.typeOf = typeOf;
 
 /*
 first: Takes an array and returns the first however many number of items in an array,
@@ -72,7 +74,7 @@ number is input, it returns only the first item in the array.
 @param {Number} number: The number of items to return from the start of the array.
 */
 
-_.first = function (array, number) {
+function first(array, number) {
    if (!Array.isArray(array)) {
        return [];
    } else if (!number) {
@@ -86,7 +88,8 @@ _.first = function (array, number) {
        }
        return items;
    }
-};
+}
+module.exports.first = first;
 
 /*
 last: Takes an array and returns the last however many number of items in an array,
@@ -97,23 +100,22 @@ number is input, it returns only the last item in the array.
 @param {Number} number: The number of items to return from the end of the array.
 */
 
-_.last = function(array, number) {
+function last(array, number) {
     const output = [];
     if (!Array.isArray(array)) {
         return [];
     } else if (!number) {
         return array[array.length-1];
-    } else {
-        if (number > array.length) {
+    } else if (number > array.length) {
             return array;
-        } else {
-            for (let i = array.length - number; i < array.length; i++) {
-                output.push(array[i]);
-            }
+    } else {
+        for (let i = array.length - number; i < array.length; i++) {
+            output.push(array[i]);
         }
-        return output;
     }
-};
+        return output;
+}
+module.exports.last = last;
 
 /*
 indexOf: Takes an array and any value. Loops through the array to find the given
@@ -124,29 +126,15 @@ value, and returns the index at which the value was found.  Returns the number
 @param {Any Value} value: The value for which to search through the given array
 */
 
-_.indexOf = function(array, value) {
+function indexOf(array, value) {
     for (let i = 0; i < array.length; i++) {
         if (array[i] === value) {
             return i;
         }
     }
     return -1;
-};
-
-/** _.contains
-* Arguments:
-*   1) An array
-*   2) A value
-* Objectives:
-*   1) Return true if <array> contains <value>
-*   2) Return false otherwise
-*   3) You must use the ternary operator in your implementation.
-* Edge Cases:
-*   1) did you use === ?
-*   2) what if no <value> is given?
-* Examples:
-*   _.contains([1,"two", 3.14], "two") -> true
-*/
+}
+module.exports.indexOf = indexOf;
 
 /*
 contains: Takes an array and a value. Searches through the given array for the 
@@ -157,6 +145,128 @@ it returns true. If the value is not found within the array, it returns false.
 @param {Any Value} value: The value to search for within the array
 */
 
-_.contains = function(array, value) {
-    return (_.indexOf(array, value) !== -1) ? true : false;
-};
+function contains(array, value) {
+    return (indexOf(array, value) !== -1) ? true : false;
+}
+module.exports.contains = contains;
+
+/*
+unique: Takes an array and returns a new array with any duplicate values from
+the original array removed (so that there is only one of each).
+
+@param {Array} array: The array for which to remove any duplicates
+*/
+
+function unique(array) {
+    const output = [];
+    each(array, function(val, i, arr) {
+        if (indexOf(output, val) === -1) {
+            output.push(val);
+        }    
+    });
+    return output;
+}
+module.exports.unique = unique;
+
+/*
+filter: Takes an array and a function. Applies a test function to every
+element in the array and returns true if the value passes the test, 
+and false otherwise. Then, it returns a new array containing the elements that 
+passed the test.
+
+@param {Array} array: The array containing the elements to which to apply the function
+@param {Function} func: The function to apply to each element in the array
+*/
+
+function filter(array, func) {
+    const output = [];
+    each(array, function(val, i, col) {
+        if (func(val, i, col)) {
+            output.push(val);
+        }
+    });
+    return output;
+}
+module.exports.filter = filter;
+
+/*
+reject: Takes an array and a function. Applies a test function to every
+element in the array and returns false if the value does not the test, 
+and true otherwise. Then, it returns a new array containing the elements that 
+did not pass the test.
+
+@param {Array} array: The array containing the elements to which to apply the function
+@param {Function} func: The function to apply to each element in the array
+*/
+
+function reject(array, func) {
+    return filter(array, function(val, i, col) {
+        if (!func(val, i, col)) {
+            return val;
+        }
+    });
+}
+module.exports.reject = reject;
+
+/*
+partition: Takes an array and a function. Applies a test function to each
+element in the array. Returns true if the element passes the test, and false
+otherwise. It pushes elements that return pass the test to one subarray and
+elements that do not pass the test into another subarray. It then returns an 
+array containing values that passed the test at index 0 and the values that
+did not pass the test at index 1.
+
+@param {Array} array: The array containing the elements to which to apply the function
+@param {Function} func: The function to apply to each element in the array
+*/
+
+function partition(array, func) {
+    const output = [];
+    const truthy = [];
+    const falsy = [];
+    each(array, function(val, i, arr) {
+        if (func(val, i, arr)) {
+            truthy.push(val);
+        } else {
+            falsy.push(val);
+        }
+    });
+    output.push(truthy, falsy);
+    return output;
+}
+module.exports.partition = partition;
+
+/*
+map: Takes an array or an object and a function. Applies the function to each
+element in the given array. Then, it returns an array containing the new values
+produced by the function.
+
+@param {Array or Object} collection: The array or object containing the elements
+to which to apply the function
+@param {Function} func: The function to apply to each element in the array
+*/
+
+function map(collection, func) {
+    const output = [];
+    each(collection, function(val, i, col) {
+        output.push(func(val, i, col));
+    });
+    return output;
+}
+module.exports.map = map;
+
+/*
+pluck: Takes an array containing objects and a property. Returns an array containing
+the values for the property of each element in the given array.
+
+@param {Array} array: An array containing objects
+@param {Property} prop: The property for which to search each object in the array
+*/
+
+function pluck(array, prop) {
+    return map(array, function(object){
+        return object[prop];
+    });
+}
+module.exports.pluck = pluck;
+
